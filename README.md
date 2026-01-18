@@ -17,7 +17,8 @@ The pipeline leverages Python for extraction, DBT for transformation, and Airflo
 
 **Looker**: Google's native Business intelligence tool to do trend analysis and forecasting.
 
-<img width="3455" height="1633" alt="Untitled-2026-01-18-0150" src="https://github.com/user-attachments/assets/b693a45e-3d3c-43df-a4d6-7647e6cebaf2" />
+<img width="3379" height="1509" alt="Untitled-2026-01-18-0153" src="https://github.com/user-attachments/assets/e3fd0c4c-04c3-4c34-9ee6-5e682c539468" />
+
 
 ## Prerequisites
 * Monzo Developer Account
