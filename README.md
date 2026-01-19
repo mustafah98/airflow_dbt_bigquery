@@ -36,8 +36,6 @@ The entire stack is containerised using Docker and managed by Astronomer CLI, en
 
 ## Project Structure
 
----
-
 ```bash
 airflow_dbt_bigquery/
 ├── Dockerfile                      # Docker container configuration
