@@ -3,9 +3,9 @@ An end-to-end data engineering project built using Google Cloud Platform leverag
 
 ## Architecture Diagram
 
----
+<img width="3379" height="1509" alt="Untitled-2026-01-18-0207" src="https://github.com/user-attachments/assets/d672f47a-a3ee-4490-a0a4-9d4abfbb0bb7" />
 
-Created in Excalidraw
+_Created in Excalidraw_
 
 ## Components
 
@@ -48,8 +48,6 @@ airflow_dbt_bigquery/
 ```
 
 ## Start Guide
-
----
 
 ### Prerequisites
 
