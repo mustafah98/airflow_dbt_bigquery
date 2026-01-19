@@ -10,8 +10,6 @@ _Created in Excalidraw_
 
 ## Components
 
----
-
 The pipeline orchestrates the flow from source API to data visualisation, ensuring data integrity at every place.
 
 * **Extraction:** Python client fetches transactions; Great Expectations validates schema.
@@ -23,7 +21,6 @@ The pipeline orchestrates the flow from source API to data visualisation, ensuri
 
 ## Key Technical Implementations
 
----
 1. **Incremental Data Processing**
 
 To handle financial data efficiently, dbt models are configured with a merge strategy. By using the is_incremental() macro, the pipeline avoids full-table refreshes, significantly reducing GCP compute costs.
