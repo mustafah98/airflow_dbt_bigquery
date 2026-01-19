@@ -3,6 +3,7 @@ An end-to-end data engineering project built using Google Cloud Platform leverag
 
 ## Architecture Diagram
 
+<img width="3379" height="1509" alt="Untitled-2026-01-18-0207" src="https://github.com/user-attachments/assets/d672f47a-a3ee-4490-a0a4-9d4abfbb0bb7" />
 
 Created in Excalidraw
 
@@ -42,7 +43,11 @@ airflow_dbt_bigquery/
 ```
 
 ## Start Guide
+
 ### Prerequisites
+
+---
+
 * Docker Desktop
 * Docker Compose
 * Monzo API Key
@@ -50,6 +55,8 @@ airflow_dbt_bigquery/
 * Gmail Account & App Password (optional)
 
 ### Files Setup
+
+---
 
 **.env file**
 ```bash
@@ -71,6 +78,9 @@ COPY dags/dbt_monzo_analytics/creds/your-service-account-key.json /app/creds/key
 ```
 
 ### Setup
+
+---
+
 1. **Clone the repository**
 ```bash
 git clone https://github.com/[insert_username]/airflow_dbt_bigquery
@@ -87,6 +97,8 @@ astro dev start
 
 ### Component Status
 
+---
+
 1. Check service status
 
 ```bash
@@ -94,6 +106,8 @@ astro dev logs --api-server
 ```
 
 ### Components
+
+---
 
 #### Monzo API Client
 * Authenticates and connects to Monzo banking API
@@ -127,6 +141,9 @@ astro dev logs --api-server
 * Users can build custom dashboards based on their preferences and requirements
 
 ### Troubleshooting
+
+---
+
 #### Rotate API Keys
 Currently the user must update the Monzo API token manually for each refresh.
 
