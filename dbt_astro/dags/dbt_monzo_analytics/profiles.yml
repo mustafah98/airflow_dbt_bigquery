@@ -3,9 +3,9 @@ dbt_monzo_analytics:
     dev:
       type: bigquery
       method: service-account
-      project: project-424d7fe3-5b4f-48a0-a49
-      dataset: monzo_data
+      project: # INSERT PROJECT ID HERE
+      dataset: # INSERT DATASET NAME HERE
       threads: 4
-      keyfile: ./creds/project-424d7fe3-5b4f-48a0-a49-b28d32165ebb.json
+      keyfile: ./creds/*.json # INSERT SERVICE ACCOUNT KEY JSON HERE
       location: EU
   target: dev
