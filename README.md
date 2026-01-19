@@ -8,6 +8,9 @@ An end-to-end data engineering project built using Google Cloud Platform leverag
 _Created in Excalidraw_
 
 ## Components
+
+---
+
 * **API:** Monzo banking data source
 * **Extract & Load:** Python with Great Expectations for extraction and data quality validation
 * **Data Warehouse:** BigQuery medallion architecture (Bronze → Silver → Gold layers)
@@ -18,6 +21,8 @@ _Created in Excalidraw_
 * **Email Alert:** Failure notification system
 
 ## Project Structure
+
+---
 
 ```bash
 airflow_dbt_bigquery/
