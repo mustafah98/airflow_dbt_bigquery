@@ -134,13 +134,12 @@ Try again or use the --wait flag to increase the time out
 ```
 To check whether the script failed run the following command 'astro dev logs --api-server'. 
 
-If you see this then the script successfully ran and you can click the link to access Airflow. 
+If you see the output below then the script successfully ran and you can click the link to access Airflow. If a failure output returned then you will have to read the response to troubleshoot the issue.
 
 ```bash
 2026-01-18T00:22:17.200399000ZINFO:     Application startup complete.
 2026-01-18T00:22:17.200402000ZINFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
-```
-If you  saw a failure then you will  have to use the response to troubleshoot the issue.
+```  
 
 #### Port Conflicts
 In some instances Port 8080 may appear as already in use stopping Airflow webserver from starting. To resolve this you can following some of the options below:
