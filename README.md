@@ -1,4 +1,4 @@
-# Monzo Banking Data Engineering Pipeline (BigQuery, DBT, Airflow, Docker)
+# Monzo Banking Data Engineering Pipeline (Airflow, BigQuery, dbt, Docker, Terraform)
 An end-to-end ELT pipeline transforming raw Monzo banking API data into actionable financial insights. This project implements a Medallion Architecture on BigQuery, featuring Incremental Loading to optimise warehouse costs and processing time.
 
 ## Architecture Diagram
