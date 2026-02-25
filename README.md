@@ -27,11 +27,7 @@ The pipeline orchestrates the flow from source API to data visualisation, ensuri
 
 To handle financial data efficiently, dbt models are configured with a merge strategy. By using the is_incremental() macro, the pipeline avoids full-table refreshes, significantly reducing GCP compute costs.
 
-2. **Multi-Layered Fail-Safes**
-
-* **Phase 1 (Ingestion):** Custom Python alerts via Gmail/SMTP for API authentication or schema validation failures.
-
-* **Phase 2 (Transformation):** dbt native tests (unique, not_null) coupled with Airflow's dependency management to stop the pipeline before bad data reaches the Gold layer.
+2. **Fail Safe Steps** dbt native tests (unique, not_null) coupled with Airflow's dependency management to stop the pipeline before bad data reaches the Gold layer.
 
 3. **Containerised Local Development**
 The entire stack is containerised using Docker and managed by Astronomer CLI, ensuring that the development environment is reproducible and 'cloud-ready'.
