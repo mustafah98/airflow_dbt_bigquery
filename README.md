@@ -4,7 +4,9 @@ An end-to-end ELT pipeline transforming raw Monzo banking API data into actionab
 ## Architecture Diagram
 The following diagram illustrates the data flow from the Monzo API through the Google Cloud ecosystem, orchestrated by Airflow and transformed via dbt.
 
-
+![Untitled-2026-01-18-0101-2](https://github.com/user-attachments/assets/e42bf544-df60-488a-9f9e-0f62bdb16cd7)<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1929.0204215494573 999.7406030267658" width="3858.0408430989146" height="1999.4812060535317"><!-- svg-source:excalidraw --><metadata></metadata><defs><symbol id="image-5d408d371a16fbed255ecfbd448b3aa83756bcf0">
 
 _Created in Excalidraw_
 
@@ -42,7 +44,7 @@ airflow_dbt_bigquery/
 ├── airflow_settings.yaml           # Airflow configuration
 ├── requirements.txt                # Python dependencies
 ├── .env                            # Environment variables
-├── .gitignore                      
+├── .gitignore                      # Git ignore rules for local/cache/secret files
 ├── dbt_astro/
 │   ├── dags/
 │   │   ├── dbt_monzo_analytics/    # dbt project root
@@ -58,6 +60,14 @@ airflow_dbt_bigquery/
 │   │   ├── plugin_utils.py         # API helper functions and constants
 │   │   └── plugin_variables.py     # Configuration, credentials, and client initialisation
 │   └── tests/                      # Great Expectations data validation
+├── terraform/
+│   ├── providers.tf                # Terraform settings, Google provider, and GCS backend
+│   ├── variables.tf                # Input variables (project_id, region, service_account_id)
+│   ├── terraform.tfvars            # Environment-specific variable values (do not commit if sensitive)
+│   ├── storage.tf                  # GCS resources (landing bucket + state bucket)
+│   ├── iam.tf                      # Service account creation and IAM permissions
+│   └── bigquery.tf                 # Bronze/Silver/Gold BigQuery datasets
+├── .terraform.lock.hcl             # Terraform provider lock file 
 └── .venv1/                         # Python virtual environment
 ```
 
@@ -71,7 +81,6 @@ airflow_dbt_bigquery/
 * Docker Compose
 * Monzo API Key
 * Google Cloud Account (free trial)
-* Gmail Account & App Password (optional)
 
 ### Files Setup
 
