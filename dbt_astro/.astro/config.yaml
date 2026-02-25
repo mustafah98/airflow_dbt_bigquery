@@ -2,3 +2,5 @@ project:
     name: dbt-astro
 postgres:
   port: 5433
+webserver:
+    port: "8080"

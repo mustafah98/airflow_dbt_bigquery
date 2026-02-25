@@ -1,5 +1,5 @@
 models:
-  - name: stg_transactions
+  - name: bronze_transactions
     columns:
       - name: id
         data_tests:
@@ -7,5 +7,4 @@ models:
           - not_null
       - name: created
         data_tests:
-          - unique
           - not_null

@@ -9,3 +9,4 @@ airflow-webserver.pid
 __pycache__/
 *.json
 .env
+terraform/*.tfvars

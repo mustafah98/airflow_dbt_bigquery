@@ -4,7 +4,7 @@ An end-to-end ELT pipeline transforming raw Monzo banking API data into actionab
 ## Architecture Diagram
 The following diagram illustrates the data flow from the Monzo API through the Google Cloud ecosystem, orchestrated by Airflow and transformed via dbt.
 
-<img width="3379" height="1509" alt="Untitled-2026-01-18-0207" src="https://github.com/user-attachments/assets/d672f47a-a3ee-4490-a0a4-9d4abfbb0bb7" />
+
 
 _Created in Excalidraw_
 
@@ -13,11 +13,11 @@ _Created in Excalidraw_
 The pipeline orchestrates the flow from source API to data visualisation, ensuring data integrity at every place.
 
 * **Extraction:** Python client fetches transactions; Great Expectations validates schema.
-* **Loading:** Data is landed in BigQuery Bronze (Raw).
-* **Transformation:** dbt manages the Silver (Cleaned) and Gold (Aggregated) layers.
-* **Incremental Logic:** The Silver layer uses incremental materialisation, processing only new transactions since the last successful run to minimise BigQuery slot usage.
-* **Orchestration:** Apache Airflow (Astronomer) handles the DAG lifecycle with integrated dbt execution via Cosmos.
-* **Data Visualization:** Looker Studio serves as the exploration layer, allowing users to query the BigQuery Gold tables to uncover spending trends, merchant behaviors, and historical financial patterns through interactive dashboards.
+* **Loading:** Data is landed into a Google Cloud Bucket
+* **Transformation:** dbt manages the Bronze (Raw), Silver (Cleaned) and Gold (Curated) layers.
+* **Incremental Logic:** The Silver layer uses incremental loading, processing only new transactions since the last successful run to minimise BigQuery data usage.
+* **Orchestration:** Apache Airflow (via Astronomer) handles the DAG lifecycle with integrated dbt execution via Cosmos.
+* **Data Visualisation:** Looker Studio serves as the exploration layer, allowing users to analyse the BigQuery Gold tables to view spending trends, merchant behaviors, and historical financial patterns through interactive dashboards.
 
 ## Key Technical Implementations
 

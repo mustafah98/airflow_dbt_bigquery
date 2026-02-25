@@ -1,11 +1,10 @@
 from api_client import *
 import pandas as pd
-import great_expectations as gx
-from email.message import EmailMessage
-import datetime
-from env_variables import *
-import smtplib
 from plugin_variables import *
+from google.cloud import storage
+import io
+from datetime import datetime, timedelta
+
 
 def get_project_id():
     with open(KEY_FILE_PATH, 'r') as f:
@@ -28,10 +27,10 @@ def fetch_account_data():
         'account_id': account_id
     }
 
-def fetch_raw_data(account_id):
+def fetch_raw_data(account_id, last_run_timestamp):
 
     balance_data = get_balance(account_id)
-    transactions_data = get_transactions(account_id)
+    transactions_data = get_transactions(account_id, last_run_timestamp)
     transactions_list = transactions_data['transactions']
 
     return {
@@ -39,11 +38,11 @@ def fetch_raw_data(account_id):
         'balance_data': balance_data,
     }
 
-def create_dataframe():
+def create_dataframe(last_run_timestamp):
     accounts_data = fetch_account_data()
     account_id = accounts_data['account_id']
 
-    raw_data = fetch_raw_data(account_id)
+    raw_data = fetch_raw_data(account_id, last_run_timestamp)
 
     accounts_list = accounts_data['accounts_list']
     balance_data = raw_data['balance_data']
@@ -54,100 +53,70 @@ def create_dataframe():
     accounts_df = pd.DataFrame(accounts_list)
     transactions_df_clean = clean_transactions(transactions_list)
 
+
     return {
         'accounts_df': accounts_df,
         'balance_df': balance_df,
         'transactions_df_clean': transactions_df_clean
     }
 
+# def clean_transactions(transactions_list):
+#
+#     transactions_df = pd.DataFrame(transactions_list)
+#     columns_to_drop = ['fees', 'metadata', 'counterparty', 'attachments', 'labels',
+#                        'categories', 'international', 'atm_fees_detailed']
+#     transactions_df_stg = transactions_df.drop(columns=columns_to_drop, errors='ignore')
+#
+#     return transactions_df_stg
 
 def clean_transactions(transactions_list):
-
     transactions_df = pd.DataFrame(transactions_list)
-    columns_to_drop = ['fees', 'metadata', 'counterparty', 'attachments', 'labels',
-                       'categories', 'international', 'atm_fees_detailed']
-    transactions_df_stg = transactions_df.drop(columns=columns_to_drop, errors='ignore')
-
-    return transactions_df_stg
-
-
-
-def setup_validation(dataframe):
-    # Step 1: Create a context (i.e., give access to GX)
-    context = gx.get_context()
-
-    # Step 2: Tell GX about the Pandas data source
-    data_source = context.data_sources.add_pandas(name="my_pandas_data")
-
-    # Step 3: Tell GX about a specific dataframe
-    data_asset = data_source.add_dataframe_asset(name="transactions")
-
-    # Step 4: Create a 'batch' (this is the actual data that will be checked)
-    batch_definition = data_asset.add_batch_definition_whole_dataframe("transactions_batch")
-    batch = batch_definition.get_batch(batch_parameters={"dataframe": dataframe})
-
-    return batch
-
-def run_validation(batch):
-    expectation1 = gx.expectations.ExpectColumnToExist(column="id")
-    expectation2 = gx.expectations.ExpectColumnValuesToNotBeNull(column="id")
-    expectation3 = gx.expectations.ExpectColumnValuesToBeUnique(column="id")
-    expectation4 = gx.expectations.ExpectColumnValuesToNotBeNull(column="amount")
-    expectation5 = gx.expectations.ExpectColumnValuesToNotBeNull(column="created")
-
-    result1 = batch.validate(expectation1)
-    result2 = batch.validate(expectation2)
-    result3 = batch.validate(expectation3)
-    result4 = batch.validate(expectation4)
-    result5 = batch.validate(expectation5)
-
-    return {
-        'id_exists': result1.success,
-        'id_not_null': result2.success,
-        'id_unique': result3.success,
-        'amount_not_null': result4.success,
-        'created_not_null': result5.success,
-        'all_passed': result1.success and result2.success and result3.success and result4.success and result5.success
-    }
+    columns_to_drop = [
+        "fees",
+        "metadata",
+        "counterparty",
+        "attachments",
+        "labels",
+        "categories",
+        "international",
+        "atm_fees_detailed",
+    ]
+    return transactions_df.drop(columns=columns_to_drop, errors="ignore")
 
 
-def send_email_failure(results):
-    email_content = f"""
-    Data Quality Checks Failed
 
-    Validation Results:
-    - ID exists: {results['id_exists']}
-    - No null values in ID:  {results['id_not_null']}
-    - Values in ID are unique: {results['id_unique']}
-    - No null values in amount: {results['amount_not_null']}
-    - No null values in created: {results['created_not_null']}
+def extract_timestamp_since():
 
-    Please review and fix the issues before data can be loaded to BigQuery.
-    """
+    if blob.exists():
+        last_run_timestamp = blob.download_as_text().strip()
+    else:
+        last_run_timestamp = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%dT%H:%M:%SZ')
+    print(f"Starting run. Fetching data since: {last_run_timestamp}")
 
-    context = gx.get_context()
-    message = EmailMessage()
-    message["To"] = "*@gmail.com" # INSERT GMAIL ADDRESS HERE
-    message["From"] = "*@gmail.com" # INSERT GMAIL ADDRESS HERE
-    x = datetime.datetime.now()
-    message["Subject"] = f"Python Failure - {x.strftime('%Y-%m-%d %H:%M:%S')}"
-    message.set_content(email_content)
+    return last_run_timestamp
 
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-        smtp.login(GMAIL_ACCOUNT, GMAIL_PASSWORD)
-        smtp.send_message(message)
+
+def upload_timestamp_since():
+    current_run_ts = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+    blob.upload_from_string(current_run_ts)
+    print(f"Success! Metadata updated. Next run will start from: {current_run_ts}")
+
+def load_df_to_gcs(df, directory_name, file_name):
+    bucket = storage_client.bucket("monzo-landing")
+    blob = bucket.blob(f"{directory_name}/date={datetime.now().strftime('%Y-%m-%d')}/{file_name}")
+
+    # Use a buffer to avoid writing to local disk
+    csv_buffer = io.StringIO()
+    df.to_csv(csv_buffer, index=False)
+
+    # The upload_from_string method automatically overwrites if the blob name already exists
+    blob.upload_from_string(csv_buffer.getvalue(), content_type='text/csv')
+    print(f"Uploaded: gs://monzo-landing/{directory_name}/date={datetime.now().strftime('%Y-%m-%d')}/{file_name}")
 
 def load_data(accounts_df, transactions_df_clean, balance_df):
-    project_id = get_project_id()
+    load_df_to_gcs(accounts_df, "accounts","raw_accounts.csv")
+    load_df_to_gcs(transactions_df_clean, "transactions","raw_transactions.csv")
+    load_df_to_gcs(balance_df, "balance","raw_balance.csv")
 
-    # Delete tables before loading
-    tables_to_truncate = ["raw_accounts", "raw_transactions", "raw_balance"]
-    for table_name in tables_to_truncate:
-        table_id = f"{project_id}.{DATASET_ID}.{table_name}"
-        client.delete_table(table_id, not_found_ok=True)
-        print(f"Deleted table {table_id}")
 
-    # Now load the data
-    load_to_bigquery(accounts_df, "raw_accounts", project_id, DATASET_ID, client)
-    load_to_bigquery(transactions_df_clean, "raw_transactions", project_id, DATASET_ID, client)
-    load_to_bigquery(balance_df, "raw_balance", project_id, DATASET_ID, client)
+

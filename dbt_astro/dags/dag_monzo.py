@@ -1,11 +1,11 @@
-"""Module providing an Airflow Dag Implementation"""
+"""Module providing an airflow Dag Implementation"""
 from datetime import datetime
 from airflow import DAG
 from airflow.providers.standard.operators.python import PythonOperator
 from cosmos import DbtTaskGroup, ExecutionConfig, ProjectConfig, ProfileConfig
 from pathlib import Path
 from main import app_runner
-from dag_variables import PROFILES_PATH, EXECUTION_PATH, PROJECT_PATH
+from dag_variable import PROFILES_PATH, EXECUTION_PATH, PROJECT_PATH
 
 profile = ProfileConfig(
     profile_name='dbt_monzo_analytics',
@@ -24,7 +24,7 @@ with DAG(
     catchup=False,
 ) as dag:
     extract_and_load = PythonOperator(
-        task_id="extract_monzo_data",
+        task_id="land_raw_data",
         python_callable=app_runner,
     )
     transform_data = DbtTaskGroup(

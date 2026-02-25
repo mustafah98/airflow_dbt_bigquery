@@ -1,18 +1,18 @@
 {{
     config(
-        materialized='incremental'
+        materialized='incremental',
+        unique_key='id'
     )
 }}
-
 
 select
     amount / 100.0 AS amount,
     created,
     updated,
     settled,
-    PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', created) AS transaction_timestamp,
-    DATE(PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', created)) AS transaction_date,
-    TIME(PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', created)) AS transaction_time,
+    created AS transaction_timestamp,
+    DATE(created) AS transaction_date,
+    TIME(created) AS transaction_time,
     id,
     category,
     description,
@@ -21,11 +21,10 @@ select
     decline_reason,
     currency
 
-from {{ source('monzo_data', 'raw_transactions') }}
+from {{ source('monzo_bronze', 'bronze_transactions') }}
 
 
 {% if is_incremental() %}
-
-    where created > (select max(created) from {{ this }} )
-
+    where created >= (select max(created) from {{ this }} )
 {% endif %}
+

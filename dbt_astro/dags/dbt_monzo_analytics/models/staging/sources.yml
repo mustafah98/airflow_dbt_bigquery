@@ -1,8 +1,8 @@
 version: 2
 
 sources:
-  - name: monzo_data
-    database: project-424d7fe3-5b4f-48a0-a49
-    schema: monzo_data
+  - name: monzo_bronze
+    database: project # INSERT DATABASE NAME
+    schema: monzo_bronze
     tables:
-      - name: raw_transactions
+      - name: bronze_transactions
